@@ -3,52 +3,80 @@ import Header from "./Components/Header"
 import './App.css'
 
 function App() {
-  const [pokemon, setPokemon] = useState({
-    name: "ditto",
-    imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/132.png",
-    height: 0,
-    hp: 0,
-    attack: 0,
-    defense: 0
-  })
-
+  const [pokemon, setPokemon] = useState(null)
   const [allPokemon, setAllPokemon] = useState([])
+  const [status, setStatus] = useState("idle") 
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
-      .then(res => res.json())
+    setStatus("loading")
+    fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch Pokémon list")
+        return res.json()
+      })
       .then(data => setAllPokemon(data.results))
-  },[])
+      .catch(err => {
+        setError(err.message)
+        setStatus("error")
+      })
+  }, [])
 
   useEffect(() => {
-    if (allPokemon.length === 0) return  // Guard: wait until list is ready
+    if (allPokemon.length === 0) return
 
     fetchRandomPokemon(allPokemon)
-  }, [allPokemon])  // Runs when allPokemon populates
+  }, [allPokemon])
 
   function fetchRandomPokemon(list) {
+    setStatus("loading")
+    setError(null)
+
     const randomIndex = Math.floor(Math.random() * list.length)
     const randomName = list[randomIndex].name
 
-    // Step 3: Use the name (or URL from the list) to fetch full Pokémon data
     fetch(`https://pokeapi.co/api/v2/pokemon/${randomName}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Could not load "${randomName}"`)
+        return res.json()
+      })
       .then(data => {
+        const imageUrl = data.sprites?.front_default
+        if (!imageUrl) throw new Error(`No image found for "${randomName}"`)
+
         setPokemon({
           name: data.name,
-          imageUrl: data.sprites.front_default,
+          imageUrl,
           height: data.height,
           hp: data.stats[0].base_stat,
           attack: data.stats[1].base_stat,
           defense: data.stats[2].base_stat
         })
+        setStatus("success")
+      })
+      .catch(() => {
+        fetchRandomPokemon(list)
       })
   }
 
   function getPkName() {
-    fetchRandomPokemon(allPokemon)  // Reuse the same logic on button click
+    fetchRandomPokemon(allPokemon)
   }
 
+  // --- Render states ---
+
+  if (status === "idle" || status === "loading") {
+    return <p>Loading...</p>
+  }
+
+  if (status === "error") {
+    return (
+      <>
+        <p>Something went wrong: {error}</p>
+        <button onClick={getPkName}>Try again</button>
+      </>
+    )
+  }
 
   return (
     <>
@@ -60,7 +88,7 @@ function App() {
       <p>HP: {pokemon.hp}</p>
       <p>Attack: {pokemon.attack}</p>
       <p>Defense: {pokemon.defense}</p>
-      <img src={pokemon.imageUrl} />
+      <img src={pokemon.imageUrl} alt={pokemon.name} />
       </main>
     </>
     
