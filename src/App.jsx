@@ -4,7 +4,11 @@ import './App.css'
 function App() {
   const [pokemon, setPokemon] = useState({
     name: "ditto",
-    imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/132.png"
+    imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/132.png",
+    height: 0,
+    hp: 0,
+    attack: 0,
+    defense: 0
   })
 
   const [allPokemon, setAllPokemon] = useState([])
@@ -31,7 +35,11 @@ function App() {
       .then(data => {
         setPokemon({
           name: data.name,
-          imageUrl: data.sprites.front_default  // grab the image from the response
+          imageUrl: data.sprites.front_default,
+          height: data.height,
+          hp: data.stats[0].base_stat,
+          attack: data.stats[1].base_stat,
+          defense: data.stats[2].base_stat
         })
       })
   }
@@ -45,6 +53,10 @@ function App() {
     <>
       <p>{pokemon.name}</p>
       <button onClick={getPkName}>Get a new pokemon</button>
+      <p>Height: {pokemon.height}</p>
+      <p>HP: {pokemon.hp}</p>
+      <p>Attack: {pokemon.attack}</p>
+      <p>Defense: {pokemon.defense}</p>
       <img src={pokemon.imageUrl} />
     </>
   )
