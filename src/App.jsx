@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Header from "./Components/Header"
 import './App.css'
 
 function App() {
@@ -51,6 +52,8 @@ function App() {
 
   return (
     <>
+    <main>
+      <Header></Header>
       <p>{pokemon.name}</p>
       <button onClick={getPkName}>Get a new pokemon</button>
       <p>Height: {pokemon.height}</p>
@@ -58,7 +61,9 @@ function App() {
       <p>Attack: {pokemon.attack}</p>
       <p>Defense: {pokemon.defense}</p>
       <img src={pokemon.imageUrl} />
+      </main>
     </>
+    
   )
 }
 
