@@ -7,6 +7,10 @@ function App() {
   const [status, setStatus] = useState("idle") 
   const [error, setError] = useState(null)
 
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   useEffect(() => {
     setStatus("loading")
     fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
@@ -79,7 +83,7 @@ function App() {
 
   return (
     <>
-      <p>{pokemon.name}</p>
+      <p>{capitalize(pokemon.name)}</p>
       <button onClick={getPkName}>Get a new pokemon</button>
       <p>Height: {pokemon.height}</p>
       <p>HP: {pokemon.hp}</p>
