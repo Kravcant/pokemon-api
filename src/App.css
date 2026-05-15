@@ -1,0 +1,11 @@
+*{
+    font-family: Quicksand;
+}
+main{
+
+    width:50%;
+    margin: auto; 
+    text-align: center;
+    border: solid 2px #f05150;
+    border-radius: 2rem;
+}
